@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/UserController.dart';
+import '../layouts/navbar.dart';
 import '../models/user.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -262,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
+      bottomNavigationBar: CustomNavBar(selectedIndex: 2),
     );
   }
 
