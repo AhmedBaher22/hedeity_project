@@ -4,13 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../database/user_dao.dart';
-// import '../models/event.dart';
-import '../models/User.dart';
+import '../models/event.dart';
+import '../models/user.dart';
 
 class UserController {
   final UserDAO _dao = UserDAO();
 
-  // Sign-up a new user
+
+// Sign-up a new user
   Future<String?> signUp(UserModel user, String password) async {
     try {
       // Check if the phone number is unique
@@ -32,20 +33,20 @@ class UserController {
 
       // Save user details in Firestore
       UserModel newUser = UserModel(
-        UserModelId: userId,
+        uid: userId,
         name: user.name,
         email: user.email,
         phone: user.phone,
-        birthday: user.birthday,
       );
       await _dao.addUser(newUser);
 
       return null; // Success
     } on FirebaseAuthException catch (e) {
       // Handle specific FirebaseAuth errors
-      if (e.code == 'network-request-failed') {
-        return "No internet connection. Please check your connection.";
-      } else {
+      if(e.code == 'network-request-failed'){
+        return "No internet connection. Please check your connection";
+      }
+      else{
         return e.message;
       }
     } catch (e) {
@@ -54,11 +55,15 @@ class UserController {
     }
   }
 
-  // Sign-in an existing user
-  Future<bool> signIn(BuildContext context, String email, String password) async {
+
+  // Login user
+  Future<bool> loginUser(BuildContext context, String email, String password) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential =
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       // Navigate to home screen
       Navigator.pushNamed(context, '/home');
@@ -69,27 +74,221 @@ class UserController {
     }
   }
 
-  // Get user by ID
-  Future<UserModel?> getUserById(String userId) async {
+
+  // Get current user
+  Future<UserModel?> getCurrentUser() async {
     try {
-      // Fetch user details from Firestore using UserDAO
-      UserModel? userDetails = await _dao.getUserByUserModelId(userId);
-      return userDetails;
+      // Retrieve the current user from FirebaseAuth
+      User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (firebaseUser != null) {
+        // Fetch additional user details from Firestore
+        UserModel? userDetails = await _dao.getUserByUID(firebaseUser.uid);
+        return userDetails;
+      } else {
+        // No user is currently logged in
+        return null;
+      }
     } catch (e) {
-      print('Error retrieving user by ID: ${e.toString()}');
+      print('Error retrieving current user: ${e.toString()}');
       return null;
     }
   }
 
-  // Sign-out the current user
-  Future<bool> signOut() async {
+
+  Future<bool> logout() async{
     try {
       await FirebaseAuth.instance.signOut();
       return true;
     } catch (e) {
-      print('Error signing out: ${e.toString()}');
       return false;
     }
   }
-}
 
+
+  Future<bool> setName(String uid,String name) async{
+    print("Controller");
+
+    return _dao.setName(uid, name);
+  }
+
+
+  Future<bool> setPhoneNumber(String uid, String phone){
+    return _dao.setPhoneNumber(uid, phone);
+  }
+
+
+  Future<String> addFriend(String phoneNumber) async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Get the current user details
+    final currentUser = await getCurrentUser();
+
+    if (currentUser == null) {
+      print("No current user found.");
+      return "No current user found.";
+    }
+
+    final currentUserId = currentUser.uid;
+
+    // Step 1: Fetch user by phone number
+    final querySnapshot = await firestore
+        .collection('users')
+        .where('phone', isEqualTo: phoneNumber)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final newUser = querySnapshot.docs.first;
+      final newUserId = newUser.id;
+
+      // Step 2: Check if friendship already exists
+      final friendsQuery = await firestore
+          .collection('friends')
+          .where('user1_id', whereIn: [currentUserId, newUserId])
+          .where('user2_id', whereIn: [currentUserId, newUserId])
+          .get();
+
+      if (friendsQuery.docs.isEmpty) {
+        // Step 3: Add friendship to 'friends' collection
+        await firestore.collection('friends').add({
+          'user1_id': currentUserId,
+          'user2_id': newUserId,
+          'created_at': FieldValue.serverTimestamp(),
+        });
+
+        print("Friendship added successfully!");
+        return "Friendship added successfully!";
+      } else {
+        print("Friendship already exists!");
+        return "Friendship already exists!";
+      }
+    } else {
+      print("No user found with this phone number.");
+      return "No user found with this phone number.";
+    }
+  }
+
+
+  Future<List<UserModel>> fetchFriends() async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Get the current user details
+    final currentUser = await getCurrentUser();
+
+    if (currentUser == null) {
+      print("No current user found.");
+      return [];
+    }
+
+    final currentUserId = currentUser.uid;
+
+    // Step 1: Fetch friend IDs where currentUserId is either user1_id or user2_id
+    final querySnapshot1 = await firestore
+        .collection('friends')
+        .where('user1_id', isEqualTo: currentUserId)
+        .get();
+
+    final querySnapshot2 = await firestore
+        .collection('friends')
+        .where('user2_id', isEqualTo: currentUserId)
+        .get();
+
+    // Combine friend IDs from both queries
+    final friendIds = [
+      ...querySnapshot1.docs.map((doc) => doc.data()['user2_id']),
+      ...querySnapshot2.docs.map((doc) => doc.data()['user1_id']),
+    ];
+
+    // Remove duplicates by converting to a set and back to a list
+    final uniqueFriendIds = friendIds.toSet().toList();
+
+    List<UserModel> friendsList = [];
+
+    // Step 2: Fetch user details for each unique friend ID
+    for (String friendId in uniqueFriendIds) {
+      final userDoc = await firestore.collection('users').doc(friendId).get();
+      if (userDoc.exists) {
+        // Convert Firestore data to UserModel
+        final userModel = UserModel.fromFirestore(userDoc.data()!);
+        friendsList.add(userModel);
+      }
+    }
+
+    return friendsList; // List of UserModel objects
+  }
+
+
+  // Fetch events for a user by their userId
+  Future<List<Event>> fetchUserEvents(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      // Query Firestore to get the events where userId matches
+      final querySnapshot = await firestore
+          .collection('events')
+          .where('createdBy', isEqualTo: userId) // Adjust field name if needed
+          .get();
+
+      // Map the fetched data to a list of EventModel
+      List<Event> eventsList = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return Event.fromFirestore(data);
+      }).toList();
+
+      return eventsList; // Return the list of events
+    } catch (e) {
+      print("Error fetching user events: ${e.toString()}");
+      return []; // Return an empty list in case of error
+    }
+  }
+
+
+  Future<int> fetchUserUpcomingEventsLength(String userId) async {
+    // Fetch the user's events
+    List<Event> myList = await fetchUserEvents(userId);
+
+    // Get the current date
+    DateTime currentDate = DateTime.now();
+
+    // Filter upcoming events only
+    List<Event> upcomingEvents = myList.where((event) {
+      // Parse the event's date from String to DateTime
+      DateTime eventDate = DateFormat('yyyy-MM-dd').parse(event.date); // Assuming the event date is in 'yyyy-MM-dd' format
+
+      // Check if the event is in the future
+      return eventDate.isAfter(currentDate);
+    }).toList();
+
+    // Return the count of upcoming events
+    return upcomingEvents.length;
+  }
+
+
+  Future<UserModel?> getUserByIdFromFirebase(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      // Directly fetch the user document by ID
+      final docSnapshot = await firestore.collection('users').doc(userId).get();
+
+      // Check if the document exists
+      if (!docSnapshot.exists) {
+        print("User with ID $userId not found.");
+        return null; // Return null if user doesn't exist
+      }
+
+      // Map the document data to the UserModel
+      final data = docSnapshot.data();
+      if (data == null) {
+        print("No data found for user ID $userId.");
+        return null; // Return null if no data exists
+      }
+
+      return UserModel.fromFirestore(data); // Map and return the user data
+    } catch (e) {
+      print("Error fetching user: ${e.toString()}");
+      throw Exception("Failed to fetch user: $e"); // Throw exception for better error handling
+    }
+  }
+
+}

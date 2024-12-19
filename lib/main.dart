@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hediety_project/screens/HomeScreen.dart';
 import 'package:hediety_project/screens/loginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hediety_project/screens/signUpScreen.dart';
+
+import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {
@@ -18,7 +23,8 @@ class MyApp extends StatelessWidget {
       home: LoginScreen(),
       routes: {
         '/signup': (context) => SignUpScreen(),
-        // '/home': (context) => HomeScreen(), // Define your home screen
+        '/login' : (context) => LoginScreen(),
+        '/home': (context) => HomeScreen(), // Define your home screen
       },
     );
   }

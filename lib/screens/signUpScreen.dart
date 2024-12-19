@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/UserController.dart';
-import '../models/User.dart';
+import '../models/user.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -13,61 +13,14 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  DateTime? _selectedDate;
-  final UserController _userController = UserController();
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null && picked != _selectedDate)
-      setState(() {
-        _selectedDate = picked;
-      });
-  }
-
-  void _signUp() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
-
-    if (_passwordController.text.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password must be at least 8 characters')),
-      );
-      return;
-    }
-
-    UserModel newUser = UserModel(
-      UserModelId: '', // This will be set by Firebase
-      name: _nameController.text,
-      email: _emailController.text,
-      phone: _phoneController.text,
-      birthday: _selectedDate,
-    );
-
-    String? result = await _userController.signUp(
-      newUser,
-      _passwordController.text,
-    );
-
-    if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result)),
-      );
-    } else {
-      Navigator.pushNamed(context, '/home');
-    }
-  }
+  final _phoneController = TextEditingController();
+  final _birthdayController = TextEditingController();
+  DateTime? _selectedBirthday;
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  bool _passwordVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +32,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Image.asset(
               'assets/Images/HEDIEATY_logo.png',
               width: double.infinity,
-              height: 300,
+              height: 400,
               fit: BoxFit.cover,
             ),
             SizedBox(height: 10),
             Text(
-              'Welcome',
+              'Sign Up',
               style: TextStyle(
                 fontFamily: 'Kitten',
                 fontSize: 40,
@@ -95,44 +48,161 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Column(
-                children: [
-                  _buildTextField(_nameController, 'USERNAME'),
-                  SizedBox(height: 10),
-                  _buildTextField(_emailController, 'EMAIL'),
-                  SizedBox(height: 10),
-                  _buildTextField(_phoneController, 'PHONE NUMBER'),
-                  SizedBox(height: 10),
-                  _buildTextField(_passwordController, 'PASSWORD', obscureText: true),
-                  SizedBox(height: 10),
-                  _buildTextField(_confirmPasswordController, 'CONFIRM PASSWORD', obscureText: true),
-                  SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () => _selectDate(context),
-                    child: AbsorbPointer(
-                      child: _buildTextField(
-                        TextEditingController(
-                          text: _selectedDate == null
-                              ? ''
-                              : DateFormat('yyyy-MM-dd').format(_selectedDate!),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      controller: _nameController,
+                      label: "FULL NAME",
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your full name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _emailController,
+                      label: "EMAIL",
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _phoneController,
+                      label: "PHONE NUMBER",
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                        if (value.length < 10) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _birthdayController,
+                      label: "BIRTHDAY",
+                      readOnly: true,
+                      onTap: () async {
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedBirthday ?? DateTime.now(),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Colors.blue,
+                                  onPrimary: Colors.white,
+                                  onSurface: Colors.black,
+                                ),
+                                textButtonTheme: TextButtonThemeData(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+
+                        if (pickedDate != null) {
+                          setState(() {
+                            _selectedBirthday = pickedDate;
+                            _birthdayController.text = formatDate(pickedDate);
+                          });
+                        }
+                      },
+                      validator: (value) {
+                        if (_selectedBirthday == null) {
+                          return 'Please select your birthday';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _passwordController,
+                      label: "PASSWORD",
+                      obscureText: _passwordVisible,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _confirmPasswordController,
+                      label: "CONFIRM PASSWORD",
+                      obscureText: _passwordVisible,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    _isLoading
+                        ? CircularProgressIndicator()
+                        : ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _handleSignUp(
+                            context,
+                            _nameController.text,
+                            _emailController.text,
+                            _phoneController.text,
+                            _passwordController.text,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        'BIRTHDAY',
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
+                        backgroundColor: Colors.blue,
+                      ),
+                      child: Text('SIGN UP'),
+                    ),
+                    SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
+                      child: Text(
+                        'ALREADY HAVE AN ACCOUNT? LOGIN',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _signUp,
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      backgroundColor: Colors.blue,
-                    ),
-                    child: Text('SIGN UP'),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -141,11 +211,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText, {bool obscureText = false}) {
-    return TextField(
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    VoidCallback? onTap,
+    bool readOnly = false,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
       controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      readOnly: readOnly,
+      onTap: onTap,
+      validator: validator,
       decoration: InputDecoration(
-        labelText: labelText,
+        labelText: label,
         filled: true,
         fillColor: Colors.grey[200],
         border: OutlineInputBorder(
@@ -153,7 +236,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
           borderSide: BorderSide.none,
         ),
       ),
-      obscureText: obscureText,
     );
+  }
+
+  void _handleSignUp(BuildContext context, String name, String email,
+      String phone, String password) async {
+    if (_selectedBirthday == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select your birthday')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      UserModel user = UserModel(
+        uid: '',
+        name: name,
+        email: email,
+        phone: phone,
+        birthday: _selectedBirthday!,
+      );
+
+      UserController userController = UserController();
+      String? result = await userController.signUp(user, password);
+
+      if (result == null) {
+        Navigator.pushNamed(context, '/home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred during sign up')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  String formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/"
+        "${date.month.toString().padLeft(2, '0')}/"
+        "${date.year}";
   }
 }

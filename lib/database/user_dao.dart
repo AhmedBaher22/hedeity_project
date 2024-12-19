@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../models/User.dart';
+import '../models/user.dart';
 
 class UserDAO {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Fetch a user by UserModelId
-  Future<UserModel?> getUserByUserModelId(String UserModelId) async {
-    final doc = await _firestore.collection('users').doc(UserModelId).get();
+  // Fetch a user by UID
+  Future<UserModel?> getUserByUID(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
     if (doc.exists) {
       return UserModel.fromFirestore(doc.data()!);
     }
@@ -41,15 +41,15 @@ class UserDAO {
 
   // Add a new user
   Future<void> addUser(UserModel user) async {
-    await _firestore.collection('users').doc(user.UserModelId).set(user.toFirestore());
+    await _firestore.collection('users').doc(user.uid).set(user.toFirestore());
   }
 
-  Future<bool> setName(String UserModelId, String name) async{
+  Future<bool> setName(String uid, String name) async{
     try {
       if (name.isNotEmpty) {
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(UserModelId)
+            .doc(uid)
             .update({'name': name});
         return true;
       }
@@ -59,12 +59,12 @@ class UserDAO {
     return false;
   }
 
-  Future<bool> setPhoneNumber(String UserModelId, String phone) async {
+  Future<bool> setPhoneNumber(String uid, String phone) async {
     try {
       if (phone.isNotEmpty) {
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(UserModelId)
+            .doc(uid)
             .update({'phone': phone});
         return true;
       }
