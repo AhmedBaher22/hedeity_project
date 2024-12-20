@@ -114,254 +114,290 @@ class _GiftDetailsScreenState extends State<GiftDetailsScreen> {
     Navigator.pushNamed(context, '/gifts');
   }
 
+  // Define color scheme
+  final Color primaryBlue = Color(0xFF1E88E5);
+  final Color secondaryBlue = Color(0xFF64B5F6);
+  final Color accentBlue = Color(0xFF0D47A1);
+  final Color lightBlue = Color(0xFFBBDEFB);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomTitle(),
-      bottomNavigationBar: CustomNavBar(selectedIndex: 4, highlightSelected: false),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [primaryBlue, secondaryBlue.withOpacity(0.7), Colors.white],
+            stops: [0.0, 0.3, 0.5],
+          ),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Gift Details',
-              style: TextStyle(
-                fontFamily: 'Aclonica',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFDB2367),
-              ),
-            ),
-            SizedBox(height: 16),
-            Center(
-              child: Stack(
-                alignment: Alignment.center, // Center the icon in the container
-                children: [
-                  Container(
-                    height: 150,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFFD700).withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(16),
+            // Custom Header
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  Icon(
-                    Icons.card_giftcard, // Replace with the desired gift icon
-                    color: Color(0xFFDB2367),
-                    size: 140, // Adjust size to fit most of the container
-                  ),
-                ],
+                    Text(
+                      'Gift Details',
+                      style: TextStyle(
+                        fontFamily: 'Aclonica',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 40), // For balance
+                  ],
+                ),
               ),
             ),
 
-
-            SizedBox(height: 16),
-            DetailRow(
-              title: 'Name',
-              value: gift.title,
-              onEdit: _toggleEditTitle,
-              controller: _titleController,
-              isEditing: _isEditingTitle,
-              isPledged: gift.isPledged,
-            ),
-            SizedBox(height: 8),
-            DetailRow(
-              title: 'Description',
-              value: gift.description ?? '',
-              onEdit: _toggleEditDescription,
-              controller: _descriptionController,
-              isEditing: _isEditingDescription,
-              isPledged: gift.isPledged,
-            ),
-            SizedBox(height: 8),
-            DetailRow(
-              title: 'Price',
-              value: gift.price,
-              onEdit: _toggleEditPrice,
-              controller: _priceController,
-              isEditing: _isEditingPrice,
-              isPledged: gift.isPledged
-            ),
-            SizedBox(height: 8),
-            DetailRow(
-              title: 'Category',
-              value: gift.category,
-              onEdit: _toggleEditCategory,
-              controller: _categoryController,
-              isEditing: _isEditingCategory,
-              isPledged: gift.isPledged,
-            ),
-            Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  flex: 2, // Give more space to the Save button
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFD700),
-                    ),
-                    child: Text(
-                      'Save',
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+            // Main Content
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  flex: 1, // Give less space to the Delete button
-                  child: ElevatedButton(
-                    onPressed: _deleteGift,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Gift Status Banner
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: gift.isPledged
+                              ? Colors.green.withOpacity(0.1)
+                              : primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.circle,
+                              size: 12,
+                              color: gift.isPledged ? Colors.green : primaryBlue,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              gift.isPledged ? "Pledged" : "Available",
+                              style: TextStyle(
+                                color: gift.isPledged ? Colors.green : primaryBlue,
+                                fontFamily: 'Aclonica',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 20),
+
+                      // Gift Icon
+                      Center(
+                        child: Container(
+                          height: 160,
+                          width: 160,
+                          decoration: BoxDecoration(
+                            color: lightBlue.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.card_giftcard,
+                            size: 80,
+                            color: primaryBlue,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+
+                      // Gift Details Card
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: lightBlue.withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildDetailSection(
+                              'Name',
+                              _titleController,
+                              _isEditingTitle,
+                              _toggleEditTitle,
+                              gift.isPledged,
+                            ),
+                            Divider(height: 30),
+                            _buildDetailSection(
+                              'Description',
+                              _descriptionController,
+                              _isEditingDescription,
+                              _toggleEditDescription,
+                              gift.isPledged,
+                            ),
+                            Divider(height: 30),
+                            _buildDetailSection(
+                              'Price',
+                              _priceController,
+                              _isEditingPrice,
+                              _toggleEditPrice,
+                              gift.isPledged,
+                            ),
+                            Divider(height: 30),
+                            _buildDetailSection(
+                              'Category',
+                              _categoryController,
+                              _isEditingCategory,
+                              _toggleEditCategory,
+                              gift.isPledged,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 30),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: gift.isPledged ? null : _saveChanges,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryBlue,
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'Aclonica',
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: gift.isPledged ? null : _deleteGift,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade400,
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'Aclonica',
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-
           ],
         ),
       ),
     );
   }
-}
 
-
-class DetailRow extends StatefulWidget {
-  final String title;
-  final String value;
-  final TextEditingController controller;
-  final VoidCallback onEdit;
-  final bool isEditing;
-  final bool isPledged;
-
-  const DetailRow({
-    required this.title,
-    required this.value,
-    required this.onEdit,
-    required this.controller,
-    required this.isEditing,
-    required this.isPledged,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  _DetailRowState createState() => _DetailRowState();
-}
-
-class _DetailRowState extends State<DetailRow> {
-  late bool isEditing;
-  late String oldValue;
-
-  @override
-  void initState() {
-    super.initState();
-    isEditing = false;
-    oldValue = widget.value;
-    widget.controller.text = widget.value;
-  }
-
-  void _toggleEditing() {
-    if(widget.isPledged){
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pledged Gifts can\'t be edited')),
-      );
-      return;
-    }
-    setState(() {
-      isEditing = !isEditing;
-    });
-  }
-
-  void _saveChanges() {
-    setState(() {
-      oldValue = widget.controller.text; // Save the new value
-      isEditing = false;
-      widget.onEdit();
-    });
-  }
-
-  void _cancelEditing() {
-    setState(() {
-      widget.controller.text = oldValue; // Revert to the old value
-      isEditing = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontFamily: 'Aclonica',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+  Widget _buildDetailSection(
+      String title,
+      TextEditingController controller,
+      bool isEditing,
+      VoidCallback onToggle,
+      bool isPledged,
+      ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontFamily: 'Aclonica',
+                fontSize: 16,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (!isPledged)
+              IconButton(
+                icon: Icon(
+                  isEditing ? Icons.close : Icons.edit,
+                  color: isEditing ? Colors.red : primaryBlue,
+                  size: 20,
                 ),
-                const SizedBox(height: 8.0), // Space between title and value
-                isEditing
-                    ? TextField(
-                  controller: widget.controller,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 12.0,
-                    ),
-                  ),
-                )
-                    : Text(
-                  oldValue,
-                  style: const TextStyle(
-                    fontFamily: 'Aclonica',
-                    fontSize: 18,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
+                onPressed: onToggle,
+              ),
+          ],
+        ),
+        SizedBox(height: 8),
+        isEditing
+            ? TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: lightBlue.withOpacity(0.1),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: primaryBlue),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: primaryBlue, width: 2),
             ),
           ),
-          if (isEditing) ...[
-            IconButton(
-              icon: const Icon(Icons.check, color: Colors.green),
-              onPressed: _saveChanges, // Save changes and close editing
-            ),
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.red),
-              onPressed: _cancelEditing, // Cancel changes and revert to old value
-            ),
-          ] else
-            IconButton(
-              icon: const Icon(Icons.edit, color: Color(0xFFDB2367)),
-              onPressed: _toggleEditing, // Enter editing mode
-            ),
-        ],
-      ),
+          style: TextStyle(
+            fontFamily: 'Aclonica',
+            fontSize: 16,
+          ),
+        )
+            : Text(
+          controller.text,
+          style: TextStyle(
+            fontFamily: 'Aclonica',
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }
-

@@ -18,10 +18,16 @@ class _GiftCardState extends State<GiftCard> {
   final EventController _eventController = EventController();
   String _eventTitle = "";
 
+  // Define color scheme
+  final Color primaryBlue = Color(0xFF1E88E5);
+  final Color secondaryBlue = Color(0xFF64B5F6);
+  final Color accentBlue = Color(0xFF0D47A1);
+  final Color lightBlue = Color(0xFFBBDEFB);
+
   @override
   void initState() {
     super.initState();
-    _fetchEventTitle(); // Fetch the event title when the widget initializes
+    _fetchEventTitle();
   }
 
   Future<void> _fetchEventTitle() async {
@@ -35,39 +41,164 @@ class _GiftCardState extends State<GiftCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: widget.gift.isPledged ? Color(0xFF64B5F6) : Color(0xFF64B5F6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ListTile(
-        leading: Image.asset(
-          'assets/icons/Gift.png',
-          height: 40.0,
-          width: 40.0,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/gift_details',
+          arguments: widget.gift,
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: secondaryBlue,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: primaryBlue.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Status Bar
+            Container(
+              decoration: BoxDecoration(
+                color: widget.gift.isPledged
+                    ? Colors.green.withOpacity(0.1)
+                    : primaryBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.circle,
+                    size: 12,
+                    color: widget.gift.isPledged ? Colors.green : primaryBlue,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    widget.gift.isPledged ? "Pledged" : "Available",
+                    style: TextStyle(
+                      color: widget.gift.isPledged ? Colors.green : primaryBlue,
+                      fontFamily: 'Aclonica',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
+            // Main Content
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Gift Icon Container
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: primaryBlue,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Image.asset(
+                      'assets/icons/Gift.png',
+                      height: 40.0,
+                      width: 40.0,
+
+                    ),
+                  ),
+                  SizedBox(width: 16),
+
+                  // Gift Details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Title
+                        Text(
+                          widget.gift.title,
+                          style: TextStyle(
+                            fontFamily: 'Aclonica',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+
+                        // Info Chips
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _buildInfoChip(
+                              Icons.category,
+                              widget.gift.category,
+                            ),
+                            _buildInfoChip(
+                              Icons.attach_money,
+                              "${widget.gift.price}",
+                            ),
+                            _buildInfoChip(
+                              Icons.event,
+                              _eventTitle,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Arrow Icon
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        title: Text(
-          widget.gift.title,
-          style: TextStyle(
-            fontFamily: 'Aclonica',
-            fontSize: 20,
-            color: widget.gift.isPledged ? Colors.white : Colors.black,
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: lightBlue.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: accentBlue,
           ),
-        ),
-        subtitle: Text(
-          "Category: ${widget.gift.category}\nPrice: ${widget.gift.price}\nEvent: $_eventTitle",
-          style: TextStyle(
-            fontFamily: 'Aclonica',
-            fontSize: 14,
-            color: widget.gift.isPledged ? Colors.white : Colors.black54,
+          SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              color: accentBlue,
+              fontSize: 14,
+              fontFamily: 'Aclonica',
+            ),
           ),
-        ),
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/gift_details',
-            arguments: widget.gift,
-          );
-        },
+        ],
       ),
     );
   }
