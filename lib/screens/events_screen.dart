@@ -99,9 +99,9 @@ class _EventsScreenState extends State<EventsScreen> {
                           Text(
                             'Hedieaty',
                             style: TextStyle(
-                              fontFamily: 'LobsterTwo',
+                              fontFamily: 'Kitten',
                               fontSize: 28,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.normal,
                               color: Colors.white,
                             ),
                           ),
