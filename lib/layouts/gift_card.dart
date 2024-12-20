@@ -36,14 +36,14 @@ class _GiftCardState extends State<GiftCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: widget.gift.isPledged ? Color(0xFFDB2367) : Colors.white,
+      color: widget.gift.isPledged ? Color(0xFF64B5F6) : Color(0xFF64B5F6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTile(
         leading: Image.asset(
-          'assets/icons/Gift_title_Icon.png',
+          'assets/icons/Gift.png',
           height: 40.0,
           width: 40.0,
-          color: Color(0xFFFFD700),
+
         ),
         title: Text(
           widget.gift.title,

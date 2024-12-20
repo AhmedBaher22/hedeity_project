@@ -36,7 +36,10 @@ class _GiftsScreenState extends State<GiftsScreen> {
     super.didChangeDependencies();
     if (_isInitialized) return;
 
-    final args = ModalRoute.of(context)?.settings.arguments;
+    final args = ModalRoute
+        .of(context)
+        ?.settings
+        .arguments;
     if (args is Map) {
       setState(() {
         if (args['firebaseId'] != null) {
@@ -90,7 +93,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
           _gifts.sort((a, b) => a.eventId.compareTo(b.eventId));
           break;
         case "Sort by Status":
-          _gifts.sort((a, b) => a.isPledged ? 1 : 0.compareTo(b.isPledged ? 1 : 0));
+          _gifts.sort((a, b) =>
+          a.isPledged ? 1 : 0.compareTo(b.isPledged ? 1 : 0));
           break;
       }
     });
@@ -103,18 +107,28 @@ class _GiftsScreenState extends State<GiftsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Custom Header with Gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [primaryBlue, secondaryBlue],
-              ),
-            ),
-            child: SafeArea(
+      body: Container(
+        // Wrap entire Scaffold body in a Container with gradient
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              primaryBlue,
+              secondaryBlue.withOpacity(0.7),
+              Colors.white,
+            ],
+            stops: [
+              0.0,
+              0.3,
+              0.5
+            ], // Adjust these values to control gradient spread
+          ),
+        ),
+        child: Column(
+          children: [
+            // Header Section
+            SafeArea(
               bottom: false,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -127,9 +141,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
                         Text(
                           'Hedieaty',
                           style: TextStyle(
-                            fontFamily: 'LobsterTwo',
+                            fontFamily: 'Kitten',
                             fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.normal,
                             color: Colors.white,
                           ),
                         ),
@@ -145,7 +159,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
                     SizedBox(height: 20),
                     // Page Title and Add Button
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
@@ -162,7 +177,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
                         children: [
                           Flexible(
                             child: Text(
-                              eventId == -1 ? "All Gifts" : "Gifts for $eventName",
+                              eventId == -1
+                                  ? "All Gifts"
+                                  : "Gifts for $eventName",
                               style: TextStyle(
                                 fontFamily: 'Aclonica',
                                 fontSize: 24,
@@ -192,15 +209,10 @@ class _GiftsScreenState extends State<GiftsScreen> {
                 ),
               ),
             ),
-          ),
 
-          // Main Content
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-              ),
-              child: Padding(
+            // Main Content
+            Expanded(
+              child: Container(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
@@ -211,7 +223,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
-                            color: lightBlue.withOpacity(0.5),
+                            color: Colors.black12,
                             blurRadius: 8,
                             offset: Offset(0, 2),
                           ),
@@ -225,7 +237,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide(color: primaryBlue, width: 2),
+                            borderSide: BorderSide(
+                                color: primaryBlue, width: 2),
                           ),
                           contentPadding: EdgeInsets.symmetric(horizontal: 20),
                           prefixIcon: Icon(Icons.sort, color: primaryBlue),
@@ -297,10 +310,11 @@ class _GiftsScreenState extends State<GiftsScreen> {
                           return Container(
                             margin: EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
-                                  color: primaryBlue,
+                                  color: lightBlue.withOpacity(0.3),
                                   blurRadius: 8,
                                   offset: Offset(0, 2),
                                 ),
@@ -321,8 +335,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: CustomNavBar(selectedIndex: 0),
     );

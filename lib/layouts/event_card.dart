@@ -79,19 +79,7 @@ class _EventCardState extends State<EventCard> {
   }
 
 
-  /// Method to get the color based on the status
-  Color _getStatusColor() {
-    switch (_status) {
-      case "Current":
-        return const Color(0xFFFFD700);
-      case "Upcoming":
-        return const Color(0xFFDB2367);
-      case "Past":
-        return Colors.grey;
-      default:
-        return Colors.transparent;
-    }
-  }
+
 
   /// Build the dynamic border using the status color
   Border _buildBorder() {
@@ -113,6 +101,25 @@ class _EventCardState extends State<EventCard> {
       });
     }
   }
+// Define color scheme
+  final Color primaryBlue = Color(0xFF1E88E5);
+  final Color secondaryBlue = Color(0xFF64B5F6);
+  final Color accentBlue = Color(0xFF0D47A1);
+  final Color lightBlue = Color(0xFFBBDEFB);
+
+  /// Method to get the color based on the status
+  Color _getStatusColor() {
+    switch (_status) {
+      case "Current":
+        return Colors.green;
+      case "Upcoming":
+        return primaryBlue;
+      case "Past":
+        return Colors.grey;
+      default:
+        return Colors.transparent;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,143 +127,180 @@ class _EventCardState extends State<EventCard> {
       children: [
         GestureDetector(
           onTap: () {
-            if(!_isEditing){
-            Navigator.pushNamed(
-              context,
-              '/gifts',
-              arguments: {
-                'eventId': widget.eventId,
-                'eventName': widget.title,
-                if (widget.firebaseId != null) 'firebaseId': widget.firebaseId,
-              },
-            );
+            if (!_isEditing) {
+              Navigator.pushNamed(
+                context,
+                '/gifts',
+                arguments: {
+                  'eventId': widget.eventId,
+                  'eventName': widget.title,
+                  if (widget.firebaseId != null) 'firebaseId': widget.firebaseId,
+                },
+              );
             }
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            padding: EdgeInsets.all(_isEditing ? 16.0 : 8.0),
+            padding: EdgeInsets.all(_isEditing ? 16.0 : 12.0),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: _buildBorder(), // Use dynamic border
+              color: lightBlue,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: _getStatusColor().withOpacity(0.5),
+                width: 2,
+              ),
               boxShadow: [
-                if (_isEditing)
-                  const BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    spreadRadius: 5,
-                  ),
+                BoxShadow(
+                  color: _isEditing
+                      ? lightBlue.withOpacity(0.3)
+                      : lightBlue.withOpacity(0.2),
+                  blurRadius: _isEditing ? 12 : 8,
+                  offset: Offset(0, 4),
+                ),
               ],
             ),
             child: Column(
               children: [
-                ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: _getStatusColor(),
-                    child: Icon(widget.icon, color: Colors.white),
-                  ),
-                  title: _isEditing
-                      ? TextFormField(
-                    initialValue: _title,
-                    onChanged: (value) => _title = value,
-                    decoration: const InputDecoration(labelText: 'Title'),
-                    style: const TextStyle(fontFamily: 'Aclonica'),
-                  )
-                      : Text(
-                    _title,
-                    style: const TextStyle(
-                      fontFamily: 'Aclonica',
-                      fontSize: 20,
-                    ),
-                  ),
-                  subtitle: _isEditing
-                      ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      DropdownButtonFormField<String>(
-                        value: _category,
-                        items: ['Fun', 'Work', 'Love', 'General']
-                            .map((category) => DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _category = value;
-                            });
-                          }
-                        },
-                        decoration: const InputDecoration(
-                            labelText: 'Category'),
+                Row(
+                  children: [
+                    // Status indicator and icon
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor().withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(height: 8),
-                      TextButton.icon(
-                        onPressed: _pickDate,
-                        icon: const Icon(Icons.calendar_today,
-                            color: Color(0xFFDB2367)),
-                        label: Text(
-                          _date.isNotEmpty
-                              ? 'Selected Date: $_date'
-                              : 'Pick a Date',
-                          style: const TextStyle(
-                            fontFamily: 'Aclonica',
-                            fontSize: 12,
-                            color: Color(0xFFDB2367),
+                      child: Icon(
+                        widget.icon,
+                        color: _getStatusColor(),
+                        size: 28,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    // Title and details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _isEditing
+                              ? TextFormField(
+                            initialValue: _title,
+                            onChanged: (value) => _title = value,
+                            decoration: InputDecoration(
+                              labelText: 'Title',
+                              labelStyle: TextStyle(color: primaryBlue),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: primaryBlue),
+                              ),
+                            ),
+                            style: TextStyle(
+                              fontFamily: 'Aclonica',
+                              fontSize: 18,
+                            ),
+                          )
+                              : Text(
+                            _title,
+                            style: TextStyle(
+                              fontFamily: 'Aclonica',
+                              fontSize: 20,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
+                          SizedBox(height: 8),
+                          _isEditing
+                              ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DropdownButtonFormField<String>(
+                                value: _category,
+                                items: ['Fun', 'Work', 'Love', 'General']
+                                    .map((category) => DropdownMenuItem(
+                                  value: category,
+                                  child: Text(category),
+                                ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      _category = value;
+                                    });
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Category',
+                                  labelStyle: TextStyle(color: primaryBlue),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: secondaryBlue),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: primaryBlue),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              ElevatedButton.icon(
+                                onPressed: _pickDate,
+                                icon: Icon(Icons.calendar_today),
+                                label: Text(_date.isNotEmpty
+                                    ? 'Date: $_date'
+                                    : 'Pick a Date'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryBlue,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                              : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildInfoRow(Icons.category, _category),
+                              SizedBox(height: 4),
+                              _buildInfoRow(Icons.calendar_today, _date),
+                              SizedBox(height: 4),
+                              _buildInfoRow(Icons.access_time, _status),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  )
-                      :Text(
-                    "Category: $_category\nDate: $_date\nStatus: $_status",
-                    style: TextStyle(
-                      fontFamily: 'Aclonica',
-                      fontSize: 14,
-                      color: Colors.grey,
                     ),
-                  ),
-
-                  trailing: widget.showActions
-                      ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isEditing = !_isEditing;
-
-                            if (!_isEditing) {
-                              _title = _originalTitle;
-                              _category = _originalCategory;
-                              _date = _originalDate;
-                            }
-                          });
-                        },
-                        icon: Icon(
-                          _isEditing ? Icons.cancel : Icons.edit,
-                          color: _isEditing
-                              ? Colors.red
-                              : _getStatusColor(),
-                        ),
+                    // Action buttons
+                    if (widget.showActions)
+                      Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _isEditing = !_isEditing;
+                                if (!_isEditing) {
+                                  _title = _originalTitle;
+                                  _category = _originalCategory;
+                                  _date = _originalDate;
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              _isEditing ? Icons.cancel : Icons.edit,
+                              color: _isEditing ? Colors.red : primaryBlue,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: widget.onDelete,
+                            icon: Icon(Icons.delete, color: Colors.red),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        onPressed: widget.onDelete,
-                        icon:
-                        const Icon(Icons.delete, color: Colors.red),
-                      ),
-                    ],
-                  )
-                      : null,
+                  ],
                 ),
                 if (_isEditing)
-                  Align(
-                    alignment: Alignment.centerRight,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFD700)),
                       onPressed: () {
                         final updatedEvent = Event(
                           title: _title,
@@ -264,22 +308,32 @@ class _EventCardState extends State<EventCard> {
                           date: _date,
                           userId: currentUser?.uid ?? "",
                         );
-
                         widget.onUpdate(updatedEvent);
                         setState(() {
                           _isEditing = false;
                           _originalTitle = _title;
                           _originalCategory = _category;
                           _originalDate = _date;
-                          _status = _calculateStatus(); // Recalculate status
-                          print('Saved changes: $updatedEvent');
+                          _status = _calculateStatus();
                         });
                       },
-                      child: const Text(
-                        'Save',
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Text(
+                        'Save Changes',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFDB2367)),
+                          fontFamily: 'Aclonica',
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -287,9 +341,29 @@ class _EventCardState extends State<EventCard> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
       ],
     );
   }
 
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: secondaryBlue,
+        ),
+        SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontFamily: 'Aclonica',
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
 }
