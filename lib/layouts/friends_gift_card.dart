@@ -1,0 +1,126 @@
+import 'package:flutter/material.dart';
+
+import '../controllers/gift_controller.dart';
+import '../models/gift.dart';
+
+
+class FriendGiftCard extends StatefulWidget {
+  final Gift gift;
+  final String eventTitle;
+  final String eventId;
+
+  const FriendGiftCard({
+    required this.gift,
+    required this.eventTitle,
+    required this.eventId,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _FriendGiftCardState createState() => _FriendGiftCardState();
+}
+
+class _FriendGiftCardState extends State<FriendGiftCard> {
+  late bool isPledged;
+  GiftController _giftController = GiftController();
+  @override
+  void initState() {
+    super.initState();
+    isPledged = widget.gift.isPledged;
+  }
+
+  void _togglePledgeStatus() async {
+    if(!isPledged){
+      String returnOfFunction = await _giftController.pledgeGift(widget.eventId,widget.gift.firebaseId);
+      if (returnOfFunction.startsWith("Success")) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(returnOfFunction),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        setState(() {
+          isPledged = true;
+          widget.gift.isPledged = true;
+        });
+      }
+      else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(returnOfFunction),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+    else{
+      String returnOfFunction = await _giftController.unpledgeGift(widget.eventId,widget.gift.firebaseId);
+      if (returnOfFunction.startsWith("Success")) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(returnOfFunction),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        setState(() {
+          isPledged = false;
+          widget.gift.isPledged = false;
+        });
+      }
+      else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(returnOfFunction),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+    setState(() {
+    });
+    // Perform any additional logic for toggling pledge status, e.g., API calls.
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: isPledged ? Color(0xFFDB2367) : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ListTile(
+        leading: Image.asset(
+          'assets/icons/Gift_title_Icon.png',
+          height: 40.0,
+          width: 40.0,
+          color: Color(0xFFFFD700),
+        ),
+        title: Text(
+          widget.gift.title,
+          style: TextStyle(
+            fontFamily: 'Aclonica',
+            fontSize: 20,
+            color: isPledged ? Colors.white : Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          "Category: ${widget.gift.category}\nPrice: ${widget.gift.price}\nEvent: ${widget.eventTitle}",
+          style: TextStyle(
+            fontFamily: 'Aclonica',
+            fontSize: 14,
+            color: isPledged ? Colors.white : Colors.black54,
+          ),
+        ),
+        trailing: IconButton(
+          icon: Image.asset(
+            'assets/icons/Hand_Icon.png',
+            color: isPledged ? Colors.white : Color(0xFFDB2367)
+          ),
+          onPressed: _togglePledgeStatus, // Handle the onPress functionality
+        ),
+      ),
+    );
+  }
+}

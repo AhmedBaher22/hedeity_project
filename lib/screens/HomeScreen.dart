@@ -61,226 +61,316 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
+// Define color scheme
+  final Color primaryBlue = Color(0xFF1E88E5);
+  final Color secondaryBlue = Color(0xFF64B5F6);
+  final Color accentBlue = Color(0xFF0D47A1);
+  final Color lightBlue = Color(0xFFBBDEFB);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Hedieaty',
-              style: TextStyle(
-                fontFamily: 'LobsterTwo',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFDB2367),
+      backgroundColor: Colors.grey[50],
+      body: Column(
+        children: [
+          // Header Section with gradient background
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF2196F3), // Bright blue at top
+                  Color(0xFF2196F3), // Lighter blue at bottom
+                ],
               ),
             ),
-            SizedBox(width: 8.0),
-            Image.asset(
-              'assets/icons/Gift_title_Icon.png',
-              height: 30.0,
-              width: 30.0,
-            ),
-          ],
-        ),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Add Friend and Special Moments Section
-            Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _friendController,
-                        decoration: InputDecoration(
-                          hintText: "Add Friend",
-                          hintStyle: TextStyle(
-                            fontFamily: 'Aclonica',
-                            color: Colors.pinkAccent.shade100,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            borderSide: BorderSide(
-                              color: Color(0xFFDB2367),
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            borderSide: BorderSide(
-                              color: Color(0xFFDB2367),
-                              width: 2.5,
-                            ),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.person_add_alt_1,
-                            color: Color(0xFFDB2367),
-                          ),
-                        ),
+                    Text(
+                      'Hedieaty',
+                      style: TextStyle(
+                        fontFamily: 'kitten',
+                        fontSize: 28,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.white,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: FloatingActionButton(
-                        onPressed: _addNewFriend,
-                        backgroundColor: Color(0xFFFFD700),
-                        shape: CircleBorder(),
-                        child: Icon(
-                          Icons.add,
-                          size: 30,
-                          color: Color(0xFFDB2367),
-                        ),
-                      ),
+                    SizedBox(width: 8.0),
+                    Image.asset(
+                      'assets/icons/Gift_title_Icon.png',
+                      height: 32.0,
+                      width: 32.0,
+                      color: Colors.white,
                     ),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 25),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Color(0xFFDB2367),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Image.asset(
-                      'assets/images/gift_box.png',
-                      height: 140,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Special gifts for\nspecial moments!",
-                          style: TextStyle(
-                            fontFamily: 'Aclonica',
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 14),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFFFD700),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/create_event');
-                            },
-                            child: Text(
-                              "Create your event",
-                              style: TextStyle(
-                                fontFamily: 'Aclonica',
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFDB2367),
-                              ),
-                            ),
-                          ),
-                        ),
+          ),
+          // Scrollable Content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF2196F3), // Bright blue at top
+                        Color(0xFF64B5F6), // Lighter blue at bottom
                       ],
-                    ),
                   ),
-                ],
-              ),
-            ),
-            SizedBox(height: 25),
-            Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75,
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: _filterFriends,
-                  decoration: InputDecoration(
-                    hintText: "Search",
-                    hintStyle: TextStyle(
-                      fontFamily: 'Aclonica',
-                      color: Colors.pinkAccent.shade100,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide(color: Color(0xFFDB2367), width: 1.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide(color: Color(0xFFDB2367), width: 2.5),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Color(0xFFDB2367),
-                    ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Add Friend Section
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _friendController,
+                                  decoration: InputDecoration(
+                                    hintText: "Add Friend by Phone Number",
+                                    hintStyle: TextStyle(
+                                      fontFamily: 'Aclonica',
+                                      color: Colors.grey[400],
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: BorderSide(color: secondaryBlue),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide:
+                                      BorderSide(color: primaryBlue, width: 2),
+                                    ),
+                                    prefixIcon:
+                                    Icon(Icons.person_add, color: primaryBlue),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [primaryBlue, accentBlue],
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: IconButton(
+                                  onPressed: _addNewFriend,
+                                  icon: Icon(Icons.add, color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      // Special Moments Section
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [primaryBlue, accentBlue],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              offset: Offset(0, 4),
+                              blurRadius: 5.0,
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/gift_box.png',
+                                    height: 120,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Create Memorable\nMoments!",
+                                      style: TextStyle(
+                                        fontFamily: 'Aclonica',
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(height: 12),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context, '/create_event');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: primaryBlue,
+                                        elevation: 3,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Create Event",
+                                        style: TextStyle(
+                                          fontFamily: 'Aclonica',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      // Search Section
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: _filterFriends,
+                          decoration: InputDecoration(
+                            hintText: "Search Friends",
+                            hintStyle: TextStyle(
+                              fontFamily: 'Aclonica',
+                              color: Colors.grey[400],
+                            ),
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.search, color: primaryBlue),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      // Friends List
+                      FutureBuilder<List<UserModel>>(
+                        future: _friendsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                AlwaysStoppedAnimation<Color>(primaryBlue),
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.people_outline,
+                                      size: 48, color: primaryBlue),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'No friends yet.\nStart adding some!',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: primaryBlue,
+                                      fontSize: 16,
+                                      fontFamily: 'Aclonica',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: _filteredFriends.length,
+                              itemBuilder: (context, index) {
+                                return _buildFriendCard(
+                                    context, _filteredFriends[index]);
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 25),
-            Expanded(
-              child: FutureBuilder<List<UserModel>>(
-                future: _friendsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No friends found.'));
-                  } else {
-                    return ListView.builder(
-                      itemCount: _filteredFriends.length,
-                      itemBuilder: (context, index) {
-                        return _buildFriendCard(
-                            context, _filteredFriends[index]); // Replace '0' with event count if needed
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: CustomNavBar(selectedIndex: 2),
     );
   }
 
-
+  // Modified friend card with blue theme
   Widget _buildFriendCard(BuildContext context, UserModel friend) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: Color(0xFFFFD700).withOpacity(0.4),
+          backgroundColor: lightBlue,
           child: Text(
             friend.name[0],
             style: TextStyle(
               fontFamily: 'Aclonica',
-              color: Color(0xFFDB2367),
+              color: primaryBlue,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -288,37 +378,37 @@ class _HomeScreenState extends State<HomeScreen> {
           friend.name,
           style: TextStyle(
             fontFamily: 'Aclonica',
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
           ),
         ),
         trailing: FutureBuilder<int>(
-          future: _userController.fetchUserUpcomingEventsLength(friend.uid), // Pass friend's ID to fetch their event count
+          future: _userController.fetchUserUpcomingEventsLength(friend.uid),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(
-                color: Color(0xFFDB2367),
-                strokeWidth: 2,
+              return SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(primaryBlue),
+                ),
               );
             } else if (snapshot.hasError) {
               return Icon(Icons.error, color: Colors.red);
-            } else if (!snapshot.hasData || snapshot.data == 0) {
-              return CircleAvatar(
-                backgroundColor: Colors.grey,
-                child: Text(
-                  '0',
-                  style: TextStyle(
-                    fontFamily: 'Aclonica',
-                    color: Colors.white,
-                  ),
-                ),
-              );
             } else {
-              return CircleAvatar(
-                backgroundColor: Color(0xFFDB2367),
+              return Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: snapshot.data! > 0 ? primaryBlue : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Text(
-                  '${snapshot.data}', // Display the event count
+                  '${snapshot.data}',
                   style: TextStyle(
                     fontFamily: 'Aclonica',
                     color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               );
@@ -326,14 +416,9 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/friend',
-            arguments: friend,
-          );
+          Navigator.pushNamed(context, '/friend', arguments: friend);
         },
       ),
     );
   }
-
 }

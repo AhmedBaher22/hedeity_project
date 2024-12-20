@@ -70,9 +70,14 @@ flutter:
     - assets/images/gift_box.png
     - assets/icons/Gift_title_Icon.png
     - assets/icons/Gift_Nav_Icon.png
-    - assets/icons/Home_White_Icon.png
+    - assets/icons/home_icon.png
     - assets/icons/Event_Icon.png
     - assets/icons/Hand_Icon.png
+    - assets/icons/calendar.png
+    - assets/icons/diamond.png
+    - assets/icons/Gift.png
+    - assets/icons/pledjet.png
+    - assets/icons/profile.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -13,8 +13,8 @@ class CustomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(20.0),
-        topRight: Radius.circular(20.0),
+        topLeft: Radius.circular(42.0),
+        topRight: Radius.circular(42.0),
       ),
       child: BottomNavigationBar(
         currentIndex: selectedIndex,
@@ -37,7 +37,7 @@ class CustomNavBar extends StatelessWidget {
             Navigator.pushNamed(context, '/profile');
           }
         },
-        backgroundColor: const Color(0xFFDB2367),
+        backgroundColor: const Color(0xFF2196F3),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFFFFD700),
         unselectedItemColor: Colors.white,
@@ -45,46 +45,36 @@ class CustomNavBar extends StatelessWidget {
         items: [
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/Gift_Nav_Icon.png',
-              color: (highlightSelected && selectedIndex == 0)
-                  ? const Color(0xFFFFD700)
-                  : Colors.white,
+              'assets/icons/Gift.png',
+
             ),
             label: "",
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/Hand_Icon.png',
-              color: (highlightSelected && selectedIndex == 1)
-                  ? const Color(0xFFFFD700)
-                  : Colors.white,
+              'assets/icons/pledjet.png',
+
             ),
             label: "",
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/Home_White_Icon.png',
-              color: (highlightSelected && selectedIndex == 2)
-                  ? const Color(0xFFFFD700)
-                  : Colors.white,
+              'assets/icons/home_icon.png',
+
             ),
             label: "",
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/Event_Icon.png',
-              color: (highlightSelected && selectedIndex == 3)
-                  ? const Color(0xFFFFD700)
-                  : Colors.white,
+              'assets/icons/calendar.png',
+
             ),
             label: "",
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person,
-              color: (highlightSelected && selectedIndex == 4)
-                  ? const Color(0xFFFFD700)
-                  : Colors.white,
+            icon: Image.asset(
+              'assets/icons/profile.png',
+
             ),
             label: "",
           ),
